@@ -1,46 +1,75 @@
-# Getting Started with Create React App
+# Template React + TypeScript + Tailwind + Supabase
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Template limpo e moderno para iniciar projetos React com TypeScript, Tailwind CSS e Supabase.
 
-## Available Scripts
+## 🚀 Tecnologias
 
-In the project directory, you can run:
+- **React 19** com TypeScript
+- **Vite** - Build tool rápida e moderna
+- **Tailwind CSS** para estilização
+- **Supabase** para backend (cliente configurado)
+- **TanStack Router** para roteamento
 
-### `npm start`
+## 📦 Instalação
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```bash
+npm i
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## 🏃 Executando o Projeto
 
-### `npm test`
+```bash
+npm run dev
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+O projeto estará disponível em [http://localhost:5173](http://localhost:5173)
 
-### `npm run build`
+## 🛠️ Scripts Disponíveis
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- `npm run dev` - Inicia o servidor de desenvolvimento
+- `npm run build` - Cria build de produção
+- `npm run preview` - Preview da build de produção
+- `npm run lint` - Executa o linter
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 📁 Estrutura do Projeto
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+src/
+├── components/          # Componentes reutilizáveis
+│   └── ui/             # Componentes de UI básicos
+├── services/           # Serviços e integrações externas
+│   └── supabaseClient.ts  # Cliente Supabase configurado
+├── routes/             # Configuração do TanStack Router
+├── types/              # Definições TypeScript
+└── utils/              # Funções utilitárias
+```
 
-### `npm run eject`
+## 🔧 Configuração do Supabase (Opcional)
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Se você quiser usar o Supabase, copie o arquivo `env.example` para `.env` e configure:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```env
+VITE_SUPABASE_URL=sua_url_do_supabase
+VITE_SUPABASE_ANON_KEY=sua_chave_anonima_do_supabase
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+O cliente Supabase já está configurado em `src/services/supabaseClient.ts` e pode ser importado diretamente nos seus componentes.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## 📝 Uso
 
-## Learn More
+Este é um template limpo, pronto para ser usado como base para seus projetos. A tela inicial mostra as tecnologias utilizadas e serve como ponto de partida.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Para mais detalhes sobre o template (estrutura, como estender, scripts), veja [TEMPLATE.md](./TEMPLATE.md).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 📖 Documentação
+
+- [React Documentation](https://react.dev/)
+- [Vite Documentation](https://vite.dev/)
+- [TypeScript Documentation](https://www.typescriptlang.org/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/)
+- [Supabase Documentation](https://supabase.com/docs)
+- [TanStack Router Documentation](https://tanstack.com/router)
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT.
