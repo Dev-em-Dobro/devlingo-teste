@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Ouvir mudanças de autenticação
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange((session) => {
       setIsAuthenticated(!!session);
     });
 
@@ -204,21 +204,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Buscar soma total de XP de todas as lições completadas
       const { data, error } = await supabase
-        .from('user_lessons')
-        .select('xp_earned')
-        .eq('user_id', user.id)
-        .eq('is_completed', true);
+        .from("user_lessons")
+        .select("xp_earned")
+        .eq("user_id", user.id)
+        .eq("is_completed", true);
 
       if (error) {
-        console.error('Erro ao buscar XP do usuário:', error);
+        console.error("Erro ao buscar XP do usuário:", error);
         return 0;
       }
 
       // Somar todo o XP ganho
-      const totalXP = data?.reduce((sum, lesson) => sum + (lesson.xp_earned || 0), 0) || 0;
+      const totalXP =
+        data?.reduce((sum, lesson) => sum + (lesson.xp_earned || 0), 0) || 0;
       return totalXP;
     } catch (error) {
-      console.error('Erro ao calcular XP:', error);
+      console.error("Erro ao calcular XP:", error);
       return 0;
     }
   };

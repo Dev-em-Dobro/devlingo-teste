@@ -1,13 +1,9 @@
-import { Unit } from '../types/unit';
+import { Unit, SupabaseLessonData } from '../types/unit';
 import { supabase } from './supabaseClient';
-
-interface SupabaseLessonData {
-  id: string;
-  title: string;
-  description: string;
-  xp_reward: number;
-  unit_id: string;
-}
+import { 
+  processLessons, 
+  calculateUnitStatus 
+} from '../utils/unitHelpers';
 
 interface SupabaseUnitData {
   id: string;
@@ -29,7 +25,7 @@ export async function getUnits(): Promise<Unit[]> {
       return [];
     }
 
-    // Buscar todas as unidades com lições aninhadas
+    // Buscar todas as unidades com lições
     const { data: unitsData, error: unitsError } = await supabase
       .from('units')
       .select(`
@@ -47,15 +43,7 @@ export async function getUnits(): Promise<Unit[]> {
     if (unitsError) throw unitsError;
     if (!unitsData) return [];
 
-    // Buscar progresso do usuário em todas as unidades
-    const { data: userUnitsData, error: userUnitsError } = await supabase
-      .from('user_units')
-      .select('unit_id, is_completed')
-      .eq('user_id', user.id);
-
-    if (userUnitsError) throw userUnitsError;
-
-    // Buscar progresso do usuário em todas as lições
+    // Buscar progresso do usuário em todas as lições (ainda precisa ser separado devido à estrutura)
     const { data: userLessonsData, error: userLessonsError } = await supabase
       .from('user_lessons')
       .select('lesson_id, is_completed')
@@ -63,50 +51,31 @@ export async function getUnits(): Promise<Unit[]> {
 
     if (userLessonsError) throw userLessonsError;
 
-    // Criar mapas para acesso rápido
-    const completedUnitsMap = new Set(
-      userUnitsData?.map((uu) => uu.unit_id) || [],
-    );
+    // Criar mapa para acesso rápido O(1) às lições completadas
     const completedLessonsMap = new Set(
       userLessonsData?.map((ul) => ul.lesson_id) || [],
     );
 
-    // Converter os dados do Supabase para o tipo Unit com status correto
+    // Converter os dados do Supabase para o tipo Unit com status calculado
     const units: Unit[] = (unitsData as SupabaseUnitData[]).map((unit, index) => {
-      // Mapear lições com status de progresso
-      const lessons = unit.lessons.map((lesson) => ({
-        id: lesson.id,
-        title: lesson.title,
-        description: lesson.description,
-        xp: lesson.xp_reward || 10,
-        completed: completedLessonsMap.has(lesson.id),
-      }));
+      // Processar lições com status de progresso
+      const lessons = processLessons(unit.lessons, completedLessonsMap);
 
-      // Verificar se todas as lições da unidade foram completadas
-      const allLessonsCompleted = lessons.length > 0 && 
-        lessons.every((lesson) => lesson.completed);
-
-      let status: 'locked' | 'available' | 'completed' = 'available';
-
-      // Se a unidade foi completada na tabela user_units OU todas as lições foram completadas
-      if (completedUnitsMap.has(unit.id) || allLessonsCompleted) {
-        status = 'completed';
-      } else if (index > 0) {
-        // Se não é a primeira unidade, verificar se a anterior foi completada
+      // Calcular status da unidade anterior (se existir)
+      let previousUnitCompleted: boolean | undefined;
+      if (index > 0) {
         const previousUnit = (unitsData as SupabaseUnitData[])[index - 1];
-        
-        const previousLessons = previousUnit.lessons.map((lesson) => ({
-          id: lesson.id,
-          completed: completedLessonsMap.has(lesson.id),
-        }));
-
-        const previousAllCompleted = previousLessons.length > 0 && 
-          previousLessons.every((lesson) => lesson.completed);
-        
-        if (!completedUnitsMap.has(previousUnit.id) && !previousAllCompleted) {
-          status = 'locked';
-        }
+        // Verificar se todas as lições da unidade anterior estão completas
+        previousUnitCompleted = previousUnit.lessons.length > 0 && 
+          previousUnit.lessons.every(lesson => completedLessonsMap.has(lesson.id));
       }
+
+      // Calcular status da unidade atual
+      const status = calculateUnitStatus({
+        lessons,
+        isFirstUnit: index === 0,
+        previousUnitCompleted,
+      });
 
       return {
         id: unit.id,
